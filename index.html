@@ -169,7 +169,7 @@
   </header>
 
   <ol id="list"></ol>
- 
+
   <footer id="footer"></footer>
 </div>
 
@@ -221,16 +221,16 @@ document.title = PROFILE.name + " — Projects";
 $("eyebrow").textContent = PROJECTS.length + (PROJECTS.length === 1 ? " project" : " projects") + " on GitHub Pages";
 $("title").textContent = PROFILE.name;
 $("intro").textContent = PROFILE.intro;
-$("footer").innerHTML = `<a href="https://github.com/${esc(PROFILE.githubUser)}">github.com/${esc(PROFILE.githubUser)}</a>`;
+$("footer").innerHTML = `<a href="https://github.com/${esc(PROFILE.githubUser)}" target="_blank" rel="noopener">github.com/${esc(PROFILE.githubUser)}</a>`;
 
 $("list").innerHTML = PROJECTS.map((p, i) => `
   <li>
-    <a class="proj" href="${esc(p.url)}" data-i="${i}">
+    <a class="proj" href="${esc(p.url)}" target="_blank" rel="noopener" data-i="${i}">
       <span class="name">${esc(p.name)}<span class="arrow">↗</span></span>
       <span class="url">${esc(shortUrl(p.url))}</span>
       <span class="inline-summary">${esc(p.summary)}</span>
     </a>
-    ${p.repo ? `<a class="repo" href="${esc(p.repo)}">source</a>` : ""}
+    ${p.repo ? `<a class="repo" href="${esc(p.repo)}" target="_blank" rel="noopener">source</a>` : ""}
   </li>`).join("");
 
 const card = $("card");
