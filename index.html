@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     EDIT THE PROJECT LIST IN THE <script> AT THE BOTTOM OF THIS FILE
+     ============================================================ */
+  :root {
+    --bg: #f6f3ec;
+    --ink: #1d1b18;
+    --muted: #6f6a60;
+    --line: #dcd6c9;
+    --accent: #c2410c;
+    --card: #1d1b18;
+    --card-ink: #f6f3ec;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151412;
+      --ink: #ece8df;
+      --muted: #8d877b;
+      --line: #2e2b27;
+      --accent: #fb923c;
+      --card: #ece8df;
+      --card-ink: #151412;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Fraunces", Georgia, serif;
+    min-height: 100vh;
+    padding: clamp(2.5rem, 8vw, 6rem) clamp(1.25rem, 6vw, 5rem);
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+
+  header { margin-bottom: clamp(2.5rem, 7vw, 4.5rem); }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .78rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  h1 {
+    font-weight: 600;
+    font-size: clamp(2.4rem, 7vw, 4.2rem);
+    line-height: 1;
+    letter-spacing: -.02em;
+  }
+  .intro {
+    margin-top: 1.25rem;
+    max-width: 34rem;
+    font-size: 1.1rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  ol { list-style: none; border-top: 1px solid var(--line); counter-reset: proj; }
+  li { border-bottom: 1px solid var(--line); counter-increment: proj; position: relative; }
+  .repo {
+    position: absolute; right: .25rem; bottom: .35rem;
+    font-family: "JetBrains Mono", monospace; font-size: .68rem;
+    color: var(--muted); text-decoration: none;
+  }
+  .repo:hover, .repo:focus-visible { color: var(--accent); text-decoration: underline; }
+  @media (hover: none) { .repo { position: static; display: block; padding: 0 0 1rem 3.75rem; margin-top: -.5rem; } }
+  .proj {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr auto;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1.15rem .25rem;
+    color: inherit;
+    text-decoration: none;
+    outline: none;
+    transition: padding .25s ease, color .2s ease;
+  }
+  .proj::before {
+    content: counter(proj, decimal-leading-zero);
+    font-family: "JetBrains Mono", monospace;
+    font-size: .75rem;
+    color: var(--muted);
+  }
+  .proj .name {
+    font-size: clamp(1.35rem, 3.6vw, 1.9rem);
+    line-height: 1.15;
+    letter-spacing: -.01em;
+  }
+  .proj .url {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .75rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .proj .arrow { display: inline-block; margin-left: .4rem; transition: transform .25s ease; }
+  .proj:hover, .proj:focus-visible { color: var(--accent); padding-left: .9rem; }
+  .proj:hover .arrow, .proj:focus-visible .arrow { transform: translate(3px, -3px); }
+  .proj:focus-visible .name { text-decoration: underline; text-underline-offset: 4px; }
+
+  /* Hover card */
+  #card {
+    position: fixed;
+    top: 0; left: 0;
+    width: min(320px, calc(100vw - 2rem));
+    background: var(--card);
+    color: var(--card-ink);
+    padding: 1rem 1.1rem 1.05rem;
+    border-radius: 10px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(6px) scale(.98);
+    transition: opacity .15s ease, transform .15s ease;
+    z-index: 10;
+    box-shadow: 0 12px 32px rgba(0,0,0,.18);
+  }
+  #card.show { opacity: 1; transform: none; }
+  #card h2 { font-size: 1.05rem; font-weight: 600; margin-bottom: .4rem; }
+  #card p { font-size: .92rem; line-height: 1.5; opacity: .85; }
+  #card .tags { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .75rem; }
+  #card .tags span {
+    font-family: "JetBrains Mono", monospace;
+    font-size: .68rem;
+    padding: .15rem .45rem;
+    border: 1px solid currentColor;
+    border-radius: 99px;
+    opacity: .7;
+  }
+
+  /* Touch screens: show the summary inline under each link instead */
+  .inline-summary { display: none; }
+  @media (hover: none) {
+    #card { display: none; }
+    .proj { grid-template-columns: 2.5rem 1fr; }
+    .proj .url { grid-column: 2; white-space: normal; word-break: break-all; }
+    .inline-summary {
+      display: block;
+      grid-column: 2;
+      font-size: .95rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+  }
+
+  footer {
+    margin-top: 3rem;
+    font-family: "JetBrains Mono", monospace;
+    font-size: .75rem;
+    color: var(--muted);
+  }
+  footer a { color: inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow" id="eyebrow"></p>
+    <h1 id="title"></h1>
+    <p class="intro" id="intro"></p>
+  </header>
+
+  <ol id="list"></ol>
+ 
+  <footer id="footer"></footer>
+</div>
+
+<div id="card" role="tooltip" aria-hidden="true"></div>
+
+<script>
+/* ================================================================
+   YOUR DETAILS — edit these
+   ================================================================ */
+const PROFILE = {
+  name: "Remington Thomas",
+  githubUser: "NightmarishWolf",
+  intro: "Things I've built and put on the web. Hover over a project to see what it is."
+};
+
+/* ================================================================
+   YOUR PROJECTS — one entry per GitHub Pages site
+   name:    what shows in the list
+   url:     the live site
+   repo:    the GitHub repo (optional)
+   summary: the short blurb shown on hover
+   tags:    optional, a few words each
+   ================================================================ */
+const PROJECTS = [
+  {
+    name: "Giga Chess",
+    url: "https://nightmarishwolf.github.io/Giga-Chess/",
+    repo: "https://github.com/NightmarishWolf/Giga-Chess",
+    summary: "Chess, scaled way up. Play on boards from 8×8 to a 96×96 mega board, shuffle the starting setup, or add new pieces like the teleporting Wormhole and the Archer that shoots from range. Play a friend on one screen or an AI on three difficulty levels.",
+    tags: ["Chess variant", "AI opponent", "Retro skins"]
+  },
+  {
+    name: "Last Rig Standing",
+    url: "https://nightmarishwolf.github.io/Last-Rig-Standing/",
+    repo: "https://github.com/NightmarishWolf/Last-Rig-Standing",
+    summary: "A naval strategy game of attrition for 2–4 players on one screen. Find hidden oil, build rigs and forward ports, grow your fleet and outlast everyone. Win by being the last player afloat, or by holding No Man's Sea.",
+    tags: ["Strategy", "Hot-seat", "2–4 players"]
+  }
+];
+
+/* ================================================================
+   No need to edit below this line
+   ================================================================ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const shortUrl = u => u.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
+document.title = PROFILE.name + " — Projects";
+$("eyebrow").textContent = PROJECTS.length + (PROJECTS.length === 1 ? " project" : " projects") + " on GitHub Pages";
+$("title").textContent = PROFILE.name;
+$("intro").textContent = PROFILE.intro;
+$("footer").innerHTML = `<a href="https://github.com/${esc(PROFILE.githubUser)}">github.com/${esc(PROFILE.githubUser)}</a>`;
+
+$("list").innerHTML = PROJECTS.map((p, i) => `
+  <li>
+    <a class="proj" href="${esc(p.url)}" data-i="${i}">
+      <span class="name">${esc(p.name)}<span class="arrow">↗</span></span>
+      <span class="url">${esc(shortUrl(p.url))}</span>
+      <span class="inline-summary">${esc(p.summary)}</span>
+    </a>
+    ${p.repo ? `<a class="repo" href="${esc(p.repo)}">source</a>` : ""}
+  </li>`).join("");
+
+const card = $("card");
+let anchor = null;
+
+function fill(p) {
+  card.innerHTML = `<h2>${esc(p.name)}</h2><p>${esc(p.summary)}</p>` +
+    (p.tags && p.tags.length ? `<div class="tags">${p.tags.map(t => `<span>${esc(t)}</span>`).join("")}</div>` : "");
+}
+function place(x, y) {
+  const pad = 16, w = card.offsetWidth, h = card.offsetHeight;
+  let left = x + 18, top = y + 18;
+  if (left + w > innerWidth - pad) left = x - w - 18;
+  if (top + h > innerHeight - pad) top = y - h - 18;
+  card.style.left = Math.max(pad, left) + "px";
+  card.style.top = Math.max(pad, top) + "px";
+}
+function show(el) {
+  anchor = el;
+  fill(PROJECTS[el.dataset.i]);
+  card.classList.add("show");
+}
+function hide() { anchor = null; card.classList.remove("show"); }
+
+document.querySelectorAll(".proj").forEach(el => {
+  el.addEventListener("mouseenter", e => { show(el); place(e.clientX, e.clientY); });
+  el.addEventListener("mousemove", e => place(e.clientX, e.clientY));
+  el.addEventListener("mouseleave", hide);
+  // Keyboard users get the card too
+  el.addEventListener("focus", () => {
+    show(el);
+    const r = el.getBoundingClientRect();
+    place(r.left + 40, r.bottom - 18);
+  });
+  el.addEventListener("blur", hide);
+});
+addEventListener("scroll", () => { if (anchor && document.activeElement !== anchor) hide(); }, { passive: true });
+</script>
+</body>
+</html>
